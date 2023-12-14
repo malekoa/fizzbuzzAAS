@@ -17,7 +17,12 @@
   </head>
   <body class="max-w-3xl mx-auto p-4 sm:p-0">
     <div class="container mx-auto py-8 space-y-4">
-      <h1 class="font-bold text-5xl">FizzBuzz As A Service</h1>
+      <div class="flex w-full justify-between items-end">
+        <h1 class="font-bold text-5xl">FizzBuzz As A Service</h1>
+        <span>
+          By <a href="https://github.com/malekoa" class="text-blue-600 hover:text-blue-800">malekoa</a>.
+        </span>
+      </div>
       <h2 class="font-bold text-3xl">Endpoints:</h2>
       <div class="flex flex-col space-y-4">
         <div class="flex flex-col space-y-2">
@@ -85,9 +90,9 @@
           <p class="text-gray-600">
             Example: <code>{"targets": [["Foo", 3], ["Bar", 5], ["Baz", 7]], "limit": 105}</code>
           </p>
-          <form action="{{ url_for('fizzbuzz_post') }}" method="POST">
+          <form action="{{ url_for('fizzbuzz_post') }}" method="POST" class="p-2 rounded bg-gray-50">
             <div class="flex flex-col space-y-2">
-              <label for="targets">Targets</label>
+              <label for="targets" class="font-bold">Targets</label>
               <input
                 type="text"
                 name="targets"
@@ -95,7 +100,7 @@
                 class="border border-gray-300 rounded-md p-1"
                 placeholder="Foo,3;Bar,5;Baz,7"
               />
-              <label for="limit">Limit</label>
+              <label for="limit" class="font-bold">Limit</label>
               <input
                 type="number"
                 name="limit"
@@ -105,14 +110,15 @@
               />
               <button
                 type="submit"
-                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                class="bg-blue-500 hover:bg-blue-700 active:bg-blue-600 text-white font-bold py-2 px-4 rounded transition"
               >
                 Submit
               </button>
             </div>
-            <div class="p-4 bg-gray-100 mt-4 rounded">
-              <h4>Result:</h4>
-              <div id="result"></div>
+            <span class="flex w-full border-b mt-3"></span>
+            <div class="flex flex-col mt-1 space-y-2">
+              <span class="font-bold">Result</span>
+              <div id="result" class="rounded border p-4 bg-white"></div>
             </div>
         </div>
       </div>
