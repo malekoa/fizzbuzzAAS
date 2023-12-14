@@ -1,0 +1,2 @@
+local:
+	flask run --debug
