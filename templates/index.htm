@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FizzbuzzAAS</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/output.css') }}"
+    />
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inconsolata:wght@300;400;700;900&family=Karla:wght@400;700&display=swap");
+      * {
+        font-family: "Karla", sans-serif;
+      }
+    </style>
+  </head>
+  <body class="max-w-3xl mx-auto p-4 sm:p-0">
+    <div class="container mx-auto py-8 space-y-4">
+      <h1 class="font-bold text-5xl">FizzBuzz As A Service</h1>
+      <h2 class="font-bold text-3xl">Endpoints:</h2>
+      <div class="flex flex-col space-y-4">
+        <div class="flex flex-col space-y-2">
+          <h3 class="font-bold text-xl"><span class="text-green-600">GET</span> /fizzbuzz?fizz={}&buzz={}&limit={}</h3>
+          <p class="text-gray-600">
+            Returns a JSON array of the first &lt;limit&gt; FizzBuzz numbers.
+          </p>
+          <p class="text-gray-600">
+            Default values are fizz=<span class="text-red-500">3</span> and buzz=<span class="text-red-500">5</span> and limit=<span class="text-red-500">100</span>.
+          </p>
+          <a
+            href="{{ url_for('fizzbuzz') }}"
+            class="text-blue-600 hover:text-blue-800"
+            >{{ url_for('fizzbuzz') }}</a
+          >
+          <a
+            href="{{ url_for('fizzbuzz', limit=50) }}"
+            class="text-blue-600 hover:text-blue-800"
+            >{{ url_for('fizzbuzz', limit=50) }}</a
+          >
+          <a
+            href="{{ url_for('fizzbuzz', fizz=5, buzz=7 ,limit=35) }}"
+            class="text-blue-600 hover:text-blue-800"
+            >{{ url_for('fizzbuzz', fizz=5, buzz=7, limit=35) }}</a
+          >
+        </div>
+        <div class="flex flex-col space-y-2">
+          <h3 class="font-bold text-xl"><span class="text-green-600">GET</span> /fizzbuzz/prime?fizz={}&buzz={}&limit={}</h3>
+          <p class="text-gray-600">
+            Returns a JSON array of the first &lt;limit&gt; FizzBuzz numbers. Prints "Prime" if the number is prime.
+          </p>
+          <p class="text-gray-600">
+            Default values are fizz=<span class="text-red-500">3</span> and buzz=<span class="text-red-500">5</span> and limit=<span class="text-red-500">100</span>.
+          </p>
+          <a
+            href="{{ url_for('fizzbuzz_prime') }}"
+            class="text-blue-600 hover:text-blue-800"
+            >{{ url_for('fizzbuzz_prime') }}
+          </a>
+          <a
+            href="{{ url_for('fizzbuzz_prime', fizz=4, buzz=8, limit=50) }}"
+            class="text-blue-600 hover:text-blue-800"
+            >{{ url_for('fizzbuzz_prime', fizz=4, buzz=8, limit=50) }}
+          </a>
+        </div>
+        <!-- 
+          # POST /fizzbuzz that takes in a JSON body with the following fields:
+          # `targets`: A list of string,int tuples. The string is the target word, and the int is the number to replace.  # `limit`: The max number to count to. Default is 100.
+          # Example: {"targets": [["Foo", 3], ["Bar", 5], ["Baz", 7]], "limit": 105}
+         -->
+        <div class="flex flex-col space-y-2">
+          <h3 class="font-bold text-xl"><span class="text-amber-600">POST</span> /fizzbuzz</h3>
+          <p class="text-gray-600">
+            Takes in a JSON body with the following fields:
+          </p>
+          <ul class="list-disc list-inside">
+            <li>
+              <code>targets</code>: A list of <code>(string,int)</code> tuples. The string is
+              the target word, and the int is the number to replace.
+            </li>
+            <li>
+              <code>limit</code>: The max number to count to. Default is 100.
+            </li>
+          </ul>
+          <p class="text-gray-600">
+            Example: <code>{"targets": [["Foo", 3], ["Bar", 5], ["Baz", 7]], "limit": 105}</code>
+          </p>
+          <form action="{{ url_for('fizzbuzz_post') }}" method="POST">
+            <div class="flex flex-col space-y-2">
+              <label for="targets">Targets</label>
+              <input
+                type="text"
+                name="targets"
+                id="targets"
+                class="border border-gray-300 rounded-md p-1"
+                placeholder="Foo,3;Bar,5;Baz,7"
+              />
+              <label for="limit">Limit</label>
+              <input
+                type="number"
+                name="limit"
+                id="limit"
+                class="border border-gray-300 rounded-md p-1"
+                placeholder="100"
+              />
+              <button
+                type="submit"
+                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              >
+                Submit
+              </button>
+            </div>
+            <div class="p-4 bg-gray-100 mt-4 rounded">
+              <h4>Result:</h4>
+              <div id="result"></div>
+            </div>
+        </div>
+      </div>
+  </body>
+  <script>
+    document.querySelector('form').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      let targets = event.target.elements.targets.value.split(';').map(pair => pair.split(','));
+      let limit = parseInt(event.target.elements.limit.value);
+
+      let data = {
+        targets: targets,
+        limit: limit
+      }
+
+      fetch("{{ url_for('fizzbuzz_post') }}", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => response.json())
+      .then(result => {
+        console.log(result);
+        let formatted = JSON.stringify(result, null, 2);
+        document.getElementById("result").textContent = formatted;
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      })
+    })
+  </script>
+</html>
